@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Card_Game.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <Image
+                Source="cards.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="set of aces from a deck of cards" />
+
+            <Label
+                Text="Card Game!"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <Button
+                x:Name="CounterBtn"
+                Text="Play Blackjack" 
+                SemanticProperties.Hint="navigates to blackjack page"
+                Clicked="play_click"
+                HorizontalOptions="Center" />
+
+            <Button
+                Text="Settings"
+                Clicked="settings_clicked"
+                HorizontalOptions="Center"
+                SemanticProperties.Hint="Navigates to settings page"/>
+
+            <Button
+                Text="Quit"
+                Clicked="quit_click"
+                HorizontalOptions="Center"
+                SemanticProperties.Hint="Quits application"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

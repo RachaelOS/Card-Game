@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Card_Game.Settings_page"
+             Title="Settings_page">
+
+    <StackLayout
+            Padding="30,0"
+            Spacing="50">
+        
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+        
+            <Label 
+                Text="Settings"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1"/>
+
+            <Button 
+                Text="Sound"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
+            <Button 
+                Text="Graphics"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
+            <Button 
+                Text="Controls"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+            
+        </VerticalStackLayout>
+
+        <VerticalStackLayout>
+
+            <Button
+                Text="Back"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center"
+                Clicked="home_button"/>
+            
+        </VerticalStackLayout>
+    </StackLayout>
+
+</ContentPage>
