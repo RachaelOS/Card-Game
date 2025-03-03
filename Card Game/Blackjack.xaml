@@ -35,7 +35,8 @@
                 Text="Twist"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                Clicked="Twist"/>
+                Clicked="Twist" />
+            
         </VerticalStackLayout>
 
         <VerticalStackLayout>

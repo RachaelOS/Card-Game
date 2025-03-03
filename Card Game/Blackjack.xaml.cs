@@ -4,7 +4,8 @@ using System.Diagnostics;
 
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Runtime.CompilerServices;
-//using Photos;
+using Microsoft.Maui.Controls;
+
 
 namespace Card_Game;
 
@@ -200,13 +201,34 @@ public partial class Blackjack : ContentPage
             update_label.Text = newText;
     }
 
-
-    private void Twist(bool twist_status)
+    private static void Twist_click(object sender, EventArgs e)
     {
-        twist_status = true;
-    }
+        Twist();
+    } 
 
-    public static void StartGame()
+   private (Hand[], Deck) Twist()
+    {
+        Hand[] players = StartGame().Item1;
+        Hand player = players[1];
+        Deck card = StartGame().Item2;
+        Card new_card = card.Deal();
+        player.AddCard(new_card);
+        UpdateLabel(player.GetHand());
+        int score = player.GetScore();
+
+        if (score > 21)
+        {
+            UpdateLabel("Bust");
+        }
+        else if (score == 21)
+        {
+            UpdateLabel("Blackjack!");
+        }
+
+        return (players, card);
+    } 
+
+    public static (Hand[], Deck) StartGame()
     {
         // Debug.WriteLine("gameplay method called");
         // initial settings for game - no. players, player hands (empty), array of players hands
@@ -215,8 +237,6 @@ public partial class Blackjack : ContentPage
         Hand npc2 = new Hand("npc2");
         Hand player = new Hand("player");
         Hand[] players = { npc1, player, npc2 };
-        bool twist_status = false;
-        bool stick_status = false;
 
         // reset deck
         Deck card = new Deck();
@@ -243,10 +263,12 @@ public partial class Blackjack : ContentPage
             var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
             blackjackPage.UpdateLabel(player.GetHand());
         }
+        return (players, card); //return each player's hand
+
 
         // player 1 takes turn - stick or bust- print action
 
-        while (Gameplay.Status(player) == "Playing")
+        /* while (Gameplay.Status(player) == "Playing")
         {
             // player takes turn - stick or bust
             if (twist_status == true)
@@ -265,23 +287,26 @@ public partial class Blackjack : ContentPage
                 {
                     blackjackPage.UpdateLabel("Blackjack!");
                 }
+
+                twist_status = false;
+
             }
-        }
-            // player 1 takes turn - stick or bust- print actions
-            // player 2 takes turn - stick or bust - print actions
-            // dealer wins or dealers turn - print actions
-            // end of game
-        }
 
-
-        // player takes turn - stick or bust
+            if (stick_status == true)
+            {
+                break;
+            }
+        } */
+        // player 1 takes turn - stick or bust- print actions
         // player 2 takes turn - stick or bust - print actions
         // dealer wins or dealers turn - print actions
         // end of game
     }
+
+
+
     public class Gameplay()
     {
-
         public static string Status(Hand hand)
         {
             if (hand.GetScore() > 21)
