@@ -25,17 +25,24 @@
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
 
+            <Label
+                x:Name="dealer_label"
+                Text="Loading..."
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+
 
             <Button
                 Text="Stick"
                 VerticalOptions="Center" 
-                HorizontalOptions="Center" />
+                HorizontalOptions="Center"
+                Clicked="Stick_click"/>
 
             <Button
                 Text="Twist"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                Clicked="Twist" />
+                Clicked="Twist_click" />
             
         </VerticalStackLayout>
 
