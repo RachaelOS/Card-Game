@@ -407,6 +407,8 @@ namespace Card_Game
             string player_status = Status(player);
             string npc1_status = Status(npc1);
             string npc2_status = Status(npc2);
+            string[] statuses = { player_status, npc1_status, npc2_status };
+            string[] names = { "you", "Player1", "Player2" };
 
             // print player's cards
             var currentWindow = Application.Current?.Windows.FirstOrDefault();
@@ -430,6 +432,15 @@ namespace Card_Game
 
             if (dealer_score > 21)
             {
+                foreach (string status in statuses)
+                {
+                    if (status == "Winner")
+                    {
+                        int index = Array.IndexOf(statuses, status);
+                        string name = names[index];
+                        UpdateLabel($"Dealer Busts. {name} wins!");
+                    }
+                }
                 UpdateLabel("Dealer Busts. Player wins!");
             }
             else if (dealer_score == 21)
@@ -444,8 +455,10 @@ namespace Card_Game
         // end of game
         
 
-        public static string Status(Hand hand)
+        public string Status(Hand hand)
         {
+            int[] players_scores = { npc1.GetScore(), player.GetScore(), npc2.GetScore(), dealer.GetScore() };
+
             if (hand.GetScore() > 21)
             {
                 return "Bust";
@@ -453,6 +466,10 @@ namespace Card_Game
             else if (hand.GetScore() == 21)
             {
                 return "Blackjack";
+            }
+            else if (hand.GetScore() == players_scores.Max())
+            {
+                return "Winner";
             }
             else
             {
