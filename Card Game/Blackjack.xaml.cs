@@ -246,9 +246,6 @@ namespace Card_Game
 
         public void StartGame()
         {
-            // Debug.WriteLine("gameplay method called");
-            // initial settings for game - no. players, player hands (empty), array of players hands
-            // int no_players = 3;
 
             Hand[] players = { npc1, player, npc2, dealer };
             
@@ -282,16 +279,18 @@ namespace Card_Game
 
             Debug.WriteLine(dealer.GetHand());
             Debug.WriteLine(dealer.GetScore());
+
+            NPC1Turn();
         }
 
         private void Stick()
         {
 
-            string newText = "Dealer's turn";
+            string newText = "Player2's turn";
 
             update_label.Text += newText;
 
-            DealersTurn();
+            NPC2Turn();
         }
         private void Twist()
         {
@@ -302,11 +301,13 @@ namespace Card_Game
 
             if (score > 21)
             {
-                UpdateLabel("Bust");
+                UpdateLabel("Bust. Player2's turn");
+
+                NPC2Turn();
             }
             else if (score == 21)
             {
-                UpdateLabel("Blackjack!");
+                UpdateLabel("Blackjack! Press stick!");
             }
 
             Debug.WriteLine("player");
@@ -318,12 +319,94 @@ namespace Card_Game
 
 
         // player 1 takes turn - stick or bust- print actions
+
+        private void NPC1Turn()
+        {
+            DealerLabel("Player1's turn");
+            int npc1_score = npc1.GetScore();
+
+            // print player's cards
+            var currentWindow = Application.Current?.Windows.FirstOrDefault();
+            if (currentWindow?.Page is not null)
+            {
+                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
+                blackjackPage.DealerLabel(npc1.GetHand());
+            }
+
+            if (npc1_score < 13)
+            {
+                Card new_card = card.Deal();
+                npc1.AddCard(new_card);
+                npc1_score = npc1.GetScore();
+                DealerLabel(npc1.GetHand());
+
+                Debug.WriteLine("npc1:");
+                Debug.WriteLine(npc1.GetHand());
+                Debug.WriteLine(npc1_score);
+            } 
+
+
+            if (npc1_score > 21)
+            {
+                DealerLabel("Player1 Busts. Your turn");
+            }
+            else
+            {
+                DealerLabel("Your turn");
+            }
+        }
+
+
         // player 2 takes turn - stick or bust - print actions
-        // dealer wins or dealers turn - print actions
+
+        private void NPC2Turn()
+        {
+            DealerLabel("Player2's turn");
+            Debug.WriteLine("player2");
+            int npc2_score = npc2.GetScore();
+
+            // print player's cards
+            var currentWindow = Application.Current?.Windows.FirstOrDefault();
+            if (currentWindow?.Page is not null)
+            {
+                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
+                blackjackPage.DealerLabel(npc2.GetHand());
+            }
+
+            if (npc2_score < 17)
+            {
+                Card new_card = card.Deal();
+                npc2.AddCard(new_card);
+                npc2_score = npc2.GetScore();
+                DealerLabel(npc2.GetHand());
+
+                Debug.WriteLine("npc2:");
+                Debug.WriteLine(npc2.GetHand());
+                Debug.WriteLine(npc2_score);
+            }
+
+
+            if (npc2_score > 21)
+            {
+                DealerLabel("Player2 Busts. Dealer's turn");
+            }
+            else
+            {
+                DealerLabel("Dealer's turn");
+            }
+
+            DealersTurn();
+        }
+
+
+
         private void DealersTurn()
         {
             int dealer_score = dealer.GetScore();
             int player_score = player.GetScore();
+            string player_status = Status(player);
+            string npc1_status = Status(npc1);
+            string npc2_status = Status(npc2);
 
             // print player's cards
             var currentWindow = Application.Current?.Windows.FirstOrDefault();
@@ -344,7 +427,6 @@ namespace Card_Game
                 Debug.WriteLine(dealer.GetHand());
                 Debug.WriteLine(dealer_score);
             } while (dealer_score < player_score);
-
 
             if (dealer_score > 21)
             {
