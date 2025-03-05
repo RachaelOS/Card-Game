@@ -5,6 +5,8 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 
 
 namespace Card_Game
@@ -28,6 +30,23 @@ namespace Card_Game
         private async void home_button(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync("//MainPage");
+        }
+
+        private void image_update(string game_status)
+        {
+            switch (game_status)
+            {
+                case "dealing" :
+                    //BackgroundImageSource = "dealing.jpg";
+                    game_image.Source = "dealing.jpg";
+                    break;
+                case "playing":
+                    game_image.Source = "playing.png";
+                    break;
+                case "end":
+                    game_image.Source = "game_over.jpg";
+                    break;
+            }
         }
 
         private void Twist_click(object sender, EventArgs e)
@@ -179,11 +198,6 @@ namespace Card_Game
                 foreach (Card card in Cards)
                 {
                     Score += card.Value;
-                    Debug.WriteLine("score:");
-                    Debug.WriteLine(Score);
-                    Debug.WriteLine("value");
-                    Debug.WriteLine(card.Value);
-                    Debug.WriteLine("-----");
                 }
 
                 //checks if score is > 21, if it is goes back over cards to change aces to 1
@@ -193,7 +207,7 @@ namespace Card_Game
                     foreach (Card card in Cards)
                     {
                         //if added card is an ace,change value of Ace depending on current score
-                        if (card.Rank == "Ace" && Score > 10)
+                        if (card.Rank == "Ace")
                         {
                             card.Value = 1;
                         }
@@ -205,6 +219,23 @@ namespace Card_Game
                 }
 
                 return Score;
+            }
+            public string Status()
+            {
+                GetScore();
+
+                if (Score > 21)
+                {
+                    return "Bust";
+                }
+                else if (Score == 21)
+                {
+                    return "Blackjack";
+                }
+                else
+                {
+                    return "Playing";
+                }
             }
 
             public string GetHand()
@@ -228,29 +259,36 @@ namespace Card_Game
             update_label.Text = newText;
         }
 
-        private void DealerLabel(string newText)
+        private void HandLabel(string newText)
         {
-            dealer_label.Text = newText;
+            hand_label.Text = newText;
         }
 
 
-        public Hand npc1 = new Hand("npc1");
-        public Hand npc2 = new Hand("npc2");
-        public Hand player = new Hand("player");
+        public Hand npc1 = new Hand("Player1");
+        public Hand npc2 = new Hand("Player2");
+        public Hand player = new Hand("you");
         public Hand dealer = new Hand("dealer");
+
+        bool player_turn = false;
 
         // reset deck
         Deck card = new Deck();
 
 
 
-        public void StartGame()
+        public async void StartGame()
         {
 
             Hand[] players = { npc1, player, npc2, dealer };
             
             // shuffle deck
             card.Shuffle();
+
+            image_update("dealing");
+
+            UpdateLabel("Dealer is dealing the cards...");
+            await Task.Delay(2000);
 
             // deal cards - 2 each 
             foreach (Hand hand in players)
@@ -259,60 +297,74 @@ namespace Card_Game
                 Card new_card2 = card.Deal();
                 hand.AddCard(new_card1);
                 hand.AddCard(new_card2);
-                // Debug.WriteLine(hand.GetName());
-                // hand.GetHand();
-                // Debug.WriteLine(hand.GetScore());
             }
+
             // print player's cards
             var currentWindow = Application.Current?.Windows.FirstOrDefault();
             if (currentWindow?.Page is not null)
             {
                 var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.UpdateLabel(player.GetHand());
+                blackjackPage.HandLabel(player.GetHand());
             }
 
-            Debug.WriteLine("player hand");
-            Debug.WriteLine(player.GetHand());
-            Debug.WriteLine(player.GetScore());
+            image_update("playing");
 
-            Debug.WriteLine("dealer");
+            Debug.WriteLine("player hand: " + player.GetHand());
+            Debug.WriteLine("player score: " + player.GetScore());
+             
+            Debug.WriteLine("dealer hand: " + dealer.GetHand());
+            Debug.WriteLine("dealer score: " + dealer.GetScore());
 
-            Debug.WriteLine(dealer.GetHand());
-            Debug.WriteLine(dealer.GetScore());
+            Debug.WriteLine("npc1 hand: " + npc1.GetHand());
+            Debug.WriteLine("npc1 score: " + npc1.GetScore());
+
+            Debug.WriteLine("npc2 hand: " + npc2.GetHand());
+            Debug.WriteLine("npc2 score: " + npc2.GetScore());
 
             NPC1Turn();
         }
 
-        private void Stick()
+        private async void Stick()
         {
-
-            string newText = "Player2's turn";
-
-            update_label.Text += newText;
-
-            NPC2Turn();
-        }
-        private void Twist()
-        {
-            Card new_card = card.Deal();
-            player.AddCard(new_card);
-            UpdateLabel(player.GetHand());
-            int score = player.GetScore();
-
-            if (score > 21)
+            if (player_turn == true)
             {
-                UpdateLabel("Bust. Player2's turn");
+                player_turn = false;
+                UpdateLabel("You chose to stick! Player2's turn...");
+                await Task.Delay(2000);
 
                 NPC2Turn();
             }
-            else if (score == 21)
+        }
+        private async void Twist()
+        {
+            if (player_turn == true)
             {
-                UpdateLabel("Blackjack! Press stick!");
+                image_update("dealing");
+
+                Card new_card = card.Deal();
+                player.AddCard(new_card);
+                HandLabel(player.GetHand());
+                int score = player.GetScore();
+
+                Debug.WriteLine("player twist");
+                Debug.WriteLine("player hand: " + player.GetHand());
+                Debug.WriteLine("player score: " + score);
+
+                if (score > 21)
+                {
+                    UpdateLabel("Bust! Player2's turn...");
+                    await Task.Delay(2000);
+
+                    NPC2Turn();
+                }
+                else if (score == 21)
+                {
+                    UpdateLabel("Blackjack! Press stick!");
+                }
+
+                image_update("playing");
             }
 
-            Debug.WriteLine("player");
-            Debug.WriteLine(player.GetHand());
-            Debug.WriteLine(score);
         }
 
 
@@ -320,185 +372,196 @@ namespace Card_Game
 
         // player 1 takes turn - stick or bust- print actions
 
-        private void NPC1Turn()
+        private async void NPC1Turn()
         {
-            DealerLabel("Player1's turn");
+            Debug.WriteLine("player1's turn");
             int npc1_score = npc1.GetScore();
 
-            // print player's cards
-            var currentWindow = Application.Current?.Windows.FirstOrDefault();
-            if (currentWindow?.Page is not null)
-            {
-                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.DealerLabel(npc1.GetHand());
-            }
+            UpdateLabel("Player1's turn...");
+            await Task.Delay(1000);
+
 
             if (npc1_score < 13)
             {
+                image_update("dealing");
                 Card new_card = card.Deal();
                 npc1.AddCard(new_card);
                 npc1_score = npc1.GetScore();
-                DealerLabel(npc1.GetHand());
 
-                Debug.WriteLine("npc1:");
-                Debug.WriteLine(npc1.GetHand());
-                Debug.WriteLine(npc1_score);
+                Debug.WriteLine("npc1 new hand: " + npc1.GetHand());
+                Debug.WriteLine("npc1 new score: " + npc1_score);
+
+                UpdateLabel("Player1 twists");
+                await Task.Delay(1000);
             } 
 
 
             if (npc1_score > 21)
             {
-                DealerLabel("Player1 Busts. Your turn");
+                UpdateLabel("Player1 is bust!");
+                Debug.WriteLine("npc1 busts");
+                await Task.Delay(1000);
             }
             else
             {
-                DealerLabel("Your turn");
+                UpdateLabel("Player1 chose to stick.");
+                await Task.Delay(1000);
             }
+
+            image_update("playing");
+
+            UpdateLabel("Your turn");
+            player_turn = true;
         }
 
 
         // player 2 takes turn - stick or bust - print actions
 
-        private void NPC2Turn()
+        private async void NPC2Turn()
         {
-            DealerLabel("Player2's turn");
-            Debug.WriteLine("player2");
-            int npc2_score = npc2.GetScore();
+            Debug.WriteLine("player2 turn");
 
-            // print player's cards
-            var currentWindow = Application.Current?.Windows.FirstOrDefault();
-            if (currentWindow?.Page is not null)
-            {
-                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.DealerLabel(npc2.GetHand());
-            }
+            UpdateLabel("Player2's turn...");
+            await Task.Delay(1000);
+
+            int npc2_score = npc2.GetScore();
 
             if (npc2_score < 17)
             {
+                image_update("dealing");
                 Card new_card = card.Deal();
                 npc2.AddCard(new_card);
                 npc2_score = npc2.GetScore();
-                DealerLabel(npc2.GetHand());
 
-                Debug.WriteLine("npc2:");
-                Debug.WriteLine(npc2.GetHand());
-                Debug.WriteLine(npc2_score);
+                UpdateLabel("Player2 twists");
+                await Task.Delay(1000);
+
+                Debug.WriteLine("npc2 new hand: " + npc2.GetHand());
+                Debug.WriteLine("npc2 new hand: " + npc2_score);
             }
 
 
             if (npc2_score > 21)
             {
-                DealerLabel("Player2 Busts. Dealer's turn");
+                Debug.WriteLine("npc2 busts");
+                UpdateLabel("Player2 is bust! Dealer's turn...");
+                await Task.Delay(1000);
             }
             else
             {
-                DealerLabel("Dealer's turn");
+                UpdateLabel("Player2 chose to stick. Dealer's turn...");
+                await Task.Delay(1000);
             }
 
+            image_update("playing");
             DealersTurn();
         }
 
 
 
-        private void DealersTurn()
+        private async void DealersTurn()
         {
             int dealer_score = dealer.GetScore();
             int player_score = player.GetScore();
-            string player_status = Status(player);
-            string npc1_status = Status(npc1);
-            string npc2_status = Status(npc2);
+            int npc1_score = npc1.GetScore();
+            int npc2_score = npc2.GetScore();
+            string player_status = player.Status();
+            string npc1_status = npc1.Status();
+            string npc2_status = npc2.Status();
+            //keep statuses and names in same order
             string[] statuses = { player_status, npc1_status, npc2_status };
-            string[] names = { "you", "Player1", "Player2" };
+            int[] scores = { player_score, npc1_score, npc2_score };
 
-            // print player's cards
+            // sets variable for scores = 0 if that player is bust
+            foreach (string status in statuses)
+            {
+                if (status == "Bust")
+                {
+                    int index = Array.IndexOf(statuses, status);
+                    scores[index] = 0;
+                }
+        
+            }
+
+
+            // print dealer's cards
             var currentWindow = Application.Current?.Windows.FirstOrDefault();
             if (currentWindow?.Page is not null)
             {
                 var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.DealerLabel(dealer.GetHand());
+                blackjackPage.UpdateLabel("Dealer's turn... \nDealer's hand: \n" + dealer.GetHand());
             }
+            await Task.Delay(1000);
 
-            do
+            while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21) 
             {
+                image_update("dealing");
                 Card new_card = card.Deal();
                 dealer.AddCard(new_card);
                 dealer_score = dealer.GetScore();
-                DealerLabel(dealer.GetHand());
 
-                Debug.WriteLine("dealer:");
-                Debug.WriteLine(dealer.GetHand());
-                Debug.WriteLine(dealer_score);
-            } while (dealer_score < player_score);
+                Debug.WriteLine("dealer new hand: " + dealer.GetHand());
+                Debug.WriteLine("dealer score: " + dealer_score);
+
+                UpdateLabel("Dealer twists \nDealer's hand: \n" + dealer.GetHand());
+                await Task.Delay(1000);
+            } 
+
+            image_update("end");
 
             if (dealer_score > 21)
             {
-                foreach (string status in statuses)
-                {
-                    if (status == "Winner")
-                    {
-                        int index = Array.IndexOf(statuses, status);
-                        string name = names[index];
-                        UpdateLabel($"Dealer Busts. {name} wins!");
-                    }
-                }
-                UpdateLabel("Dealer Busts. Player wins!");
+                Debug.WriteLine("dealer bust");
+                dealer_score = 0;
+
+                Hand winner = Winner();
+                UpdateLabel($"Dealer Busts. {winner.Name} wins!");
+                Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
+
             }
             else if (dealer_score == 21)
             {
-                UpdateLabel("Dealer Blackjack");
+                UpdateLabel("Blackjack! Dealer wins!");
+                Debug.WriteLine("Dealer Blackjack");
             }
             else
             {
                 UpdateLabel("Dealer wins with score of " + dealer_score);
+                Debug.WriteLine("Dealer wins with score of " + dealer_score);
             }
         }
         // end of game
         
 
-        public string Status(Hand hand)
-        {
-            int[] players_scores = { npc1.GetScore(), player.GetScore(), npc2.GetScore(), dealer.GetScore() };
 
-            if (hand.GetScore() > 21)
+        //determines winner of game
+        public Hand Winner()
+        {
+            Hand[] players = {npc1, player, npc2, dealer};
+            List<Hand> candidates = new List<Hand>();
+            List<int> scores = new List<int>();
+
+
+            foreach (Hand name in players)
             {
-                return "Bust";
+                if (name.Status() != "Bust")
+                {
+                    candidates.Add(name);
+                }
             }
-            else if (hand.GetScore() == 21)
+
+            foreach (Hand candidate in candidates)
             {
-                return "Blackjack";
+                scores.Add(candidate.GetScore());
             }
-            else if (hand.GetScore() == players_scores.Max())
-            {
-                return "Winner";
-            }
-            else
-            {
-                return "Playing";
-            }
+
+            int highest_score = scores.Max();
+            int index = scores.IndexOf(highest_score);
+            Hand winner = candidates[index];
+
+            return winner;
         }
 
-        public static string Winner(Hand player, Hand dealer)
-        {
-            if (player.GetScore() > 21)
-            {
-                return "Dealer";
-            }
-            else if (dealer.GetScore() > 21)
-            {
-                return "Player";
-            }
-            else if (player.GetScore() > dealer.GetScore())
-            {
-                return "Player";
-            }
-            else if (dealer.GetScore() > player.GetScore())
-            {
-                return "Dealer";
-            }
-            else
-            {
-                return "Push";
-            }
-        }
+
     }
 }

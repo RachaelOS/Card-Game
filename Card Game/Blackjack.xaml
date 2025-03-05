@@ -2,15 +2,24 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Card_Game.Blackjack"
-             Title="Blackjack">
+             Title="Blackjack"
+             BackgroundImageSource="background.jpg">
+
 
     <StackLayout
                 Padding="30,0"
                 Spacing="50">
+
         <VerticalStackLayout
                 Padding="30,0"
                 Spacing="25">
-
+            <Image
+                x:Name="game_image"
+                Source="playing.png"
+                HeightRequest="185"
+                Aspect= "AspectFit"
+                SemanticProperties.Description="set of aces from a deck of cards" />
+            
             <Label 
                 Text="Blackjack Game Page"
                 VerticalOptions="Center" 
@@ -26,7 +35,7 @@
                 HorizontalOptions="Center" />
 
             <Label
-                x:Name="dealer_label"
+                x:Name="hand_label"
                 Text="Loading..."
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
