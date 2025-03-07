@@ -18,7 +18,7 @@
                 Source="playing.png"
                 HeightRequest="185"
                 Aspect= "AspectFit"
-                SemanticProperties.Description="set of aces from a deck of cards" />
+                SemanticProperties.Description="set of aces from a deck of cards" /> 
             
             <Label 
                 Text="Blackjack Game Page"

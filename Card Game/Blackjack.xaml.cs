@@ -36,7 +36,7 @@ namespace Card_Game
         {
             switch (game_status)
             {
-                case "dealing" :
+                case "dealing":
                     //BackgroundImageSource = "dealing.jpg";
                     game_image.Source = "dealing.jpg";
                     break;
@@ -281,7 +281,7 @@ namespace Card_Game
         {
 
             Hand[] players = { npc1, player, npc2, dealer };
-            
+
             // shuffle deck
             card.Shuffle();
 
@@ -307,11 +307,12 @@ namespace Card_Game
                 blackjackPage.HandLabel(player.GetHand());
             }
 
+
             image_update("playing");
 
             Debug.WriteLine("player hand: " + player.GetHand());
             Debug.WriteLine("player score: " + player.GetScore());
-             
+
             Debug.WriteLine("dealer hand: " + dealer.GetHand());
             Debug.WriteLine("dealer score: " + dealer.GetScore());
 
@@ -330,6 +331,7 @@ namespace Card_Game
             {
                 player_turn = false;
                 UpdateLabel("You chose to stick! Player2's turn...");
+                Debug.WriteLine("player stick");
                 await Task.Delay(2000);
 
                 NPC2Turn();
@@ -378,7 +380,7 @@ namespace Card_Game
             int npc1_score = npc1.GetScore();
 
             UpdateLabel("Player1's turn...");
-            await Task.Delay(1000);
+            await Task.Delay(1500);
 
 
             if (npc1_score < 13)
@@ -392,20 +394,20 @@ namespace Card_Game
                 Debug.WriteLine("npc1 new score: " + npc1_score);
 
                 UpdateLabel("Player1 twists");
-                await Task.Delay(1000);
-            } 
+                await Task.Delay(1500);
+            }
 
 
             if (npc1_score > 21)
             {
                 UpdateLabel("Player1 is bust!");
                 Debug.WriteLine("npc1 busts");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
             }
             else
             {
                 UpdateLabel("Player1 chose to stick.");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
             }
 
             image_update("playing");
@@ -422,7 +424,7 @@ namespace Card_Game
             Debug.WriteLine("player2 turn");
 
             UpdateLabel("Player2's turn...");
-            await Task.Delay(1000);
+            await Task.Delay(1500);
 
             int npc2_score = npc2.GetScore();
 
@@ -434,7 +436,7 @@ namespace Card_Game
                 npc2_score = npc2.GetScore();
 
                 UpdateLabel("Player2 twists");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
 
                 Debug.WriteLine("npc2 new hand: " + npc2.GetHand());
                 Debug.WriteLine("npc2 new hand: " + npc2_score);
@@ -445,12 +447,12 @@ namespace Card_Game
             {
                 Debug.WriteLine("npc2 busts");
                 UpdateLabel("Player2 is bust! Dealer's turn...");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
             }
             else
             {
                 UpdateLabel("Player2 chose to stick. Dealer's turn...");
-                await Task.Delay(1000);
+                await Task.Delay(1500);
             }
 
             image_update("playing");
@@ -480,7 +482,7 @@ namespace Card_Game
                     int index = Array.IndexOf(statuses, status);
                     scores[index] = 0;
                 }
-        
+
             }
 
 
@@ -491,9 +493,9 @@ namespace Card_Game
                 var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
                 blackjackPage.UpdateLabel("Dealer's turn... \nDealer's hand: \n" + dealer.GetHand());
             }
-            await Task.Delay(1000);
+            await Task.Delay(1500);
 
-            while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21) 
+            while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21)
             {
                 image_update("dealing");
                 Card new_card = card.Deal();
@@ -504,8 +506,8 @@ namespace Card_Game
                 Debug.WriteLine("dealer score: " + dealer_score);
 
                 UpdateLabel("Dealer twists \nDealer's hand: \n" + dealer.GetHand());
-                await Task.Delay(1000);
-            } 
+                await Task.Delay(1500);
+            }
 
             image_update("end");
 
@@ -514,9 +516,7 @@ namespace Card_Game
                 Debug.WriteLine("dealer bust");
                 dealer_score = 0;
 
-                Hand winner = Winner();
-                UpdateLabel($"Dealer Busts. {winner.Name} wins!");
-                Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
+                Winner();
 
             }
             else if (dealer_score == 21)
@@ -531,17 +531,19 @@ namespace Card_Game
             }
         }
         // end of game
-        
+
 
 
         //determines winner of game
-        public Hand Winner()
+        public async void Winner()
         {
-            Hand[] players = {npc1, player, npc2, dealer};
+            player.Name = "You";
+            Hand[] players = { npc1, player, npc2 };
             List<Hand> candidates = new List<Hand>();
             List<int> scores = new List<int>();
+            List<Hand> highest_scores = new List<Hand>();
 
-
+            //only consider players who are not bust
             foreach (Hand name in players)
             {
                 if (name.Status() != "Bust")
@@ -550,17 +552,56 @@ namespace Card_Game
                 }
             }
 
+            //add candidate scores to list
             foreach (Hand candidate in candidates)
             {
                 scores.Add(candidate.GetScore());
             }
 
             int highest_score = scores.Max();
-            int index = scores.IndexOf(highest_score);
-            Hand winner = candidates[index];
 
-            return winner;
+
+            //if there are multiple winners, randomly select winner
+            if (scores.Count(x => x == highest_score) > 1)
+            {
+                foreach (Hand candidate in candidates)
+                {
+                    if (candidate.GetScore() == highest_score)
+                    {
+                        highest_scores.Add(candidate);
+                    }
+                }
+                Random rng = new Random();
+                int index = rng.Next(0, highest_scores.Count);
+                Hand winner = highest_scores[index];
+
+                UpdateLabel($"There's a draw! Randomly selecting winner!");
+                Debug.WriteLine($"There's a draw! Randomly selecting winner!");
+                await Task.Delay(2000);
+
+                UpdateLabel($"Dealer Busts. {winner.Name} wins!");
+                Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
+            }
+            //if there is only one winner
+            else
+            {
+                int index = scores.IndexOf(highest_score);
+                Hand winner = candidates[index];
+
+                if (winner.GetScore() == 21)
+                {
+                    UpdateLabel($"Blackjack! {winner.Name} wins!");
+                    Debug.WriteLine($"Blackjack! {winner.Name} wins!");
+                }
+                else
+                {
+                    UpdateLabel($"{winner.Name} wins with score of {highest_score}");
+                    Debug.WriteLine($"{winner.Name} wins with score of {highest_score}");
+            }
+
         }
+
+
 
 
     }
