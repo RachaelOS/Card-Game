@@ -5,20 +5,26 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Card_Game"
     Shell.FlyoutBehavior="Disabled"
-    Title="Card_Game">
+    Shell.NavBarIsVisible="False"
+    >
 
     <ShellContent
-            Title="Home"
+            
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="MainPage" />
 
     <ShellContent
-                Title="Blackjack"
+                
                 ContentTemplate="{DataTemplate local:Blackjack}"
                 Route="Blackjack" />
 
     <ShellContent
-                Title="Settings_page"
-                ContentTemplate="{DataTemplate local:Settings_page}"
-                Route="Settings_page" />
+                
+                ContentTemplate="{DataTemplate local:Instructions_page}"
+                Route="Instructions_page" />
+
+    <ShellContent
+                
+                ContentTemplate="{DataTemplate local:About}"
+                Route="About" />
 </Shell>  

@@ -18,9 +18,9 @@ namespace Card_Game
             InitializeComponent();
         }
 
-        private async void settings_clicked(object sender, EventArgs e)
+        private async void instructions_clicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("//Settings_page");
+            await Shell.Current.GoToAsync("//Instructions_page");
         }
 
         private async void play_click(object sender, EventArgs e)
@@ -28,6 +28,11 @@ namespace Card_Game
 
             await Shell.Current.GoToAsync("Blackjack");
             WeakReferenceMessenger.Default.Send(new StartGameMessage());
+        }
+        private async void about_click(object sender, EventArgs e)
+        {
+
+            await Shell.Current.GoToAsync("//About");
         }
 
         private void quit_click(object sender, EventArgs e)

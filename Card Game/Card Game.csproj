@@ -51,12 +51,20 @@
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
 		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+    <MauiImage Include="Resources/Images/deck/*.png" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+ <ItemGroup>
+	  <None Remove="Resources\Images\deck\10_of_clubs.png" />
+	  <None Remove="Resources\Images\deck\2_of_spades.png" />
+	  <None Remove="Resources\Images\deck\ten_of_clubs.png" />
+	  <None Remove="Resources\Images\deck\two_of_spades.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -75,7 +83,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="About.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Blackjack.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="NewPage1.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Settings_page.xaml">

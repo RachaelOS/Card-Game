@@ -1,20 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Card_Game.MainPage">
+             x:Class="Card_Game.MainPage"
+             BackgroundImageSource="background.jpg">
 
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
             <Image
-                Source="dotnet_bot.png"
+                Source="main_transparent.png"
                 HeightRequest="185"
                 Aspect="AspectFit"
                 SemanticProperties.Description="set of aces from a deck of cards" /> 
 
             <Label
-                Text="Card Game!"
+                Text="Blackjack!"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
 
@@ -26,10 +27,16 @@
                 HorizontalOptions="Center" />
 
             <Button
-                Text="Settings"
-                Clicked="settings_clicked"
+                Text="How To Play"
+                Clicked="instructions_clicked"
                 HorizontalOptions="Center"
-                SemanticProperties.Hint="Navigates to settings page"/>
+                SemanticProperties.Hint="Navigates to How To Play page"/>
+
+            <Button
+                Text="About"
+                Clicked="about_click"
+                HorizontalOptions="Center"
+                SemanticProperties.Hint="Navigates to Main Menu page"/>
 
             <Button
                 Text="Quit"

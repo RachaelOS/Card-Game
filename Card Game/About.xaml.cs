@@ -1,14 +1,13 @@
 namespace Card_Game;
 
-public partial class Settings_page : ContentPage
+public partial class About : ContentPage
 {
-	public Settings_page()
+	public About()
 	{
 		InitializeComponent();
 	}
-
     private async void home_button(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("MainPage");
+        await Shell.Current.GoToAsync("//MainPage");
     }
 }

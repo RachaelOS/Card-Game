@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Card_Game.About"
+             Title="About">
+
+    <StackLayout
+                    Padding="30,0"
+                    Spacing="50">
+            <VerticalStackLayout>
+        
+            <Label 
+                    Text="About"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Style="{StaticResource Headline}"
+                    SemanticProperties.HeadingLevel="Level1"/>
+
+            <Label
+                    Text="This app and featured artwork was created by Rachael O'Sullivan using the .NET MAUI framework."
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+
+            <Button
+                    Text="Main Menu"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Center"
+                    Clicked="home_button"/>
+
+        </VerticalStackLayout>
+    </StackLayout>
+</ContentPage>
