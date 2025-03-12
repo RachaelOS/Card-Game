@@ -5,45 +5,48 @@
              BackgroundImageSource="background.jpg">
 
     <ScrollView>
+
+
         <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+                Padding="30"
+                Spacing="30"
+                VerticalOptions="Center"
+                >
             <Image
-                Source="main_transparent.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="set of aces from a deck of cards" /> 
+                    Source="main_transparent.png"
+                    HeightRequest="185"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="set of aces from a deck of cards" />
 
             <Label
-                Text="Blackjack!"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
+                    Text="Blackjack!"
+                    Style="{StaticResource Headline}"
+                    SemanticProperties.HeadingLevel="Level1" />
 
             <Button
-                x:Name="CounterBtn"
-                Text="Play Blackjack" 
-                SemanticProperties.Hint="navigates to blackjack page"
-                Clicked="play_click"
-                HorizontalOptions="Center" />
+                    x:Name="CounterBtn"
+                    Text="Play Blackjack" 
+                    SemanticProperties.Hint="navigates to blackjack page"
+                    Clicked="play_click"
+                    HorizontalOptions="Center" />
 
             <Button
-                Text="How To Play"
-                Clicked="instructions_clicked"
-                HorizontalOptions="Center"
-                SemanticProperties.Hint="Navigates to How To Play page"/>
+                    Text="How To Play"
+                    Clicked="instructions_clicked"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Hint="Navigates to How To Play page"/>
 
             <Button
-                Text="About"
-                Clicked="about_click"
-                HorizontalOptions="Center"
-                SemanticProperties.Hint="Navigates to Main Menu page"/>
+                    Text="About"
+                    Clicked="about_click"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Hint="Navigates to Main Menu page"/>
 
             <Button
-                Text="Quit"
-                Clicked="quit_click"
-                HorizontalOptions="Center"
-                SemanticProperties.Hint="Quits application"/>
-
+                    Text="Quit"
+                    Clicked="quit_click"
+                    HorizontalOptions="Center"
+                    SemanticProperties.Hint="Quits application"/>
         </VerticalStackLayout>
     </ScrollView>
 

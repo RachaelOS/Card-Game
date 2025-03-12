@@ -5,96 +5,112 @@
              Title="Blackjack"
              >
 
-    <Grid>
-        <Image
-            x:Name="Background_colour"
-            Source="background.jpg"
-            Aspect= "AspectFill"
-            Grid.Row="0"
-            Grid.Column="0"
-            Opacity="0.95"
-            />
+        <Grid>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
         
-        <Image
-                x:Name="game_image"
-                Source="main_transparent.png"
-                Aspect= "AspectFit"
+            <Image
+                x:Name="Background_colour"
+                Source="background.jpg"
+                Aspect= "AspectFill"
                 Grid.Row="0"
                 Grid.Column="0"
-                SemanticProperties.Description="set of aces from a deck of cards" />
-
-
-
-
-
-        <StackLayout
-                    Padding="30,0"
-                    Spacing="50">
-
-            <VerticalStackLayout
-                    Padding="30,0"
-                    Spacing="25">
-                <!-- <Image
-                    x:Name="game_image"
-                    Source="playing.png"
-                    HeightRequest="185"
-                    Aspect= "AspectFit"
-                    SemanticProperties.Description="set of aces from a deck of cards" /> -->
-
-            
-            
-                <Label 
-                    Text="Blackjack Game Page"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    Style="{StaticResource Headline}"
-                    SemanticProperties.HeadingLevel="Level1"/>
-
-
-                <Label
-                    x:Name="update_label"
-                    Text="Loading..."
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center" />
-
-                <Label
-                    x:Name="hand_label"
-                    Text="Loading..."
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center" />
-
-
-                <Button
-                    Text="Stick"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    Clicked="Stick_click"/>
-
-                <Button
-                    Text="Twist"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    Clicked="Twist_click" />
-            
-            </VerticalStackLayout>
-
-            <VerticalStackLayout>
-                <Button
-                    Text="Quit"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"
-                    Clicked="home_button"/>
-            </VerticalStackLayout>
-        </StackLayout>
+                Opacity="0.95"
+                />
         
-        <Grid VerticalOptions="End" Padding="10" x:Name="handGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+            <Image
+                    x:Name="game_image"
+                    Source="main_transparent.png"
+                    Aspect= "AspectFit"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    SemanticProperties.Description="set of aces from a deck of cards" />
 
-            <!-- this is where the card images are added-->
+
+
+
+
+            <StackLayout
+                        Padding="30"
+                        Spacing="50">
+
+                <VerticalStackLayout
+                        Padding="30,0"
+                        Spacing="25"
+                        Grid.Row="0">
+
+
+                    <Label 
+                        Text="Blackjack Game Page"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Center"
+                        Style="{StaticResource Headline}"
+                        SemanticProperties.HeadingLevel="Level1"/>
+
+
+                    <Label
+                        x:Name="update_label"
+                        Text="Loading..."
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Center" />
+
+                    <Label
+                        x:Name="hand_label"
+                        Text="Loading..."
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </StackLayout>
+
+            <StackLayout
+                VerticalOptions="End"
+                Padding="30.0"
+                Spacing="25"
+                >
+            
+                <VerticalStackLayout 
+                        Padding="30,0"
+                        Spacing="25"
+                        Grid.Row="1">
+                
+                    <Button
+                        Text="Stick"
+                        VerticalOptions="End" 
+                        HorizontalOptions="End"
+                        Clicked="Stick_click"/>
+
+                    <Button
+                        Text="Twist"
+                        VerticalOptions="End" 
+                        HorizontalOptions="End"
+                        Clicked="Twist_click" />
+            
+                </VerticalStackLayout>
+
+                <Grid VerticalOptions="End" Padding="10" x:Name="handGrid" Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- this is where the card images are added-->
+                </Grid>
+            
+                <VerticalStackLayout
+                    Grid.Row="3">
+                    <Button
+                        Text="Quit"
+                        VerticalOptions="End" 
+                        HorizontalOptions="Center"
+                        Clicked="home_button"/>
+                </VerticalStackLayout>
+            </StackLayout>
+
+
         </Grid>
-    </Grid>
+
 
 </ContentPage>

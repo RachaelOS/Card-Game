@@ -1,6 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics;
+using Microsoft.Maui.Devices;
 
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Runtime.CompilerServices;
@@ -16,8 +17,15 @@ namespace Card_Game
         public Blackjack()
         {
             InitializeComponent();
+            // Get the screen size
+            var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
+            double screenWidth = mainDisplayInfo.Width;
+            double screenHeight = mainDisplayInfo.Height;
+            this.WidthRequest = screenWidth / 2;
+            this.HeightRequest = screenHeight / 2;
             //receives message from MainPage to start game - calls StartGame method
             WeakReferenceMessenger.Default.Register<StartGameMessage>(this, (r, m) => StartGame());
+
         }
 
         protected override void OnDisappearing()
@@ -26,6 +34,8 @@ namespace Card_Game
             // Unregister the message handler when the page is disposed
             WeakReferenceMessenger.Default.Unregister<StartGameMessage>(this);
         }
+
+
 
         private async void home_button(object sender, EventArgs e)
         {
@@ -362,7 +372,6 @@ namespace Card_Game
         {
             hand_label.Text = newText;
         }
-
 
         public Hand npc1 = new Hand("Player1");
         public Hand npc2 = new Hand("Player2");
