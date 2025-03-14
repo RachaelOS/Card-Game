@@ -19,7 +19,7 @@
                     SemanticProperties.Description="set of aces from a deck of cards" />
 
             <Label
-                    Text="Blackjack!"
+                    Text="BlackJack!"
                     Style="{StaticResource Headline}"
                     SemanticProperties.HeadingLevel="Level1" />
 

@@ -29,25 +29,37 @@
                     Grid.Column="0"
                     SemanticProperties.Description="set of aces from a deck of cards" />
 
+            <CheckBox
+                    x:Name="score_switch"
+                    Grid.Row="0"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    CheckedChanged="ShowScore"
+                    />
+            <Label
+            Text="Show Score:       "
+            Grid.Row="0"
+            VerticalOptions="Start"
+            HorizontalOptions="End"
+            Padding="12"
+            TextColor="Gray"/>
 
 
 
-
-            <StackLayout
+        <StackLayout
                         Padding="30"
                         Spacing="50">
 
                 <VerticalStackLayout
-                        Padding="30,0"
+                        Padding="30"
                         Spacing="25"
                         Grid.Row="0">
 
-
                     <Label 
-                        Text="Blackjack Game Page"
+                        Text="BlackJack!"
                         VerticalOptions="Center" 
                         HorizontalOptions="Center"
-                        Style="{StaticResource Headline}"
+                        Style="{StaticResource Headline2}"
                         SemanticProperties.HeadingLevel="Level1"/>
 
 
@@ -55,13 +67,18 @@
                         x:Name="update_label"
                         Text="Loading..."
                         VerticalOptions="Center" 
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center"
+                        Style="{StaticResource SubHeadline}"/>
 
                     <Label
-                        x:Name="hand_label"
+                        x:Name="score_label"
                         Text="Loading..."
                         VerticalOptions="Center" 
-                        HorizontalOptions="Center" />
+                        HorizontalOptions="Center" 
+                        IsVisible="False"
+                        TextColor="LightGray"
+                        FontSize="18"/>
+                    
                 </VerticalStackLayout>
             </StackLayout>
 
@@ -99,14 +116,30 @@
                     <!-- this is where the card images are added-->
                 </Grid>
             
-                <VerticalStackLayout
-                    Grid.Row="3">
-                    <Button
+                
+                <Grid
+                    Grid.Row="3"
+                    ColumnSpacing="10"
+                    HorizontalOptions="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                    
+                <Button
+                        Text="Restart"
+                        Grid.Column="0"
+                        VerticalOptions="Start" 
+                        HorizontalOptions="Center"
+                        Clicked="restart_button"/>
+                    
+                <Button
                         Text="Quit"
+                        Grid.Column="1"
                         VerticalOptions="End" 
                         HorizontalOptions="Center"
                         Clicked="home_button"/>
-                </VerticalStackLayout>
+            </Grid>
             </StackLayout>
 
 

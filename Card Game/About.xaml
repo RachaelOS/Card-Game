@@ -2,12 +2,18 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Card_Game.About"
-             Title="About">
+             Title="About"
+             BackgroundImageSource="background.jpg">
 
     <StackLayout
-                    Padding="30,0"
-                    Spacing="50">
-            <VerticalStackLayout>
+            Padding="30"
+            Spacing="50"
+            VerticalOptions="Start"
+            HorizontalOptions="Center">
+
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="50">
         
             <Label 
                     Text="About"
@@ -16,10 +22,39 @@
                     Style="{StaticResource Headline}"
                     SemanticProperties.HeadingLevel="Level1"/>
 
-            <Label
-                    Text="This app and featured artwork was created by Rachael O'Sullivan using the .NET MAUI framework."
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Center"/>
+            <Label VerticalOptions="Center" HorizontalOptions="Center" Style="{StaticResource Text}">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="This app and featured artwork was created by Rachael O'Sullivan, to view my Portfolio website click " />
+                    <Span Text="here" TextDecorations="Underline" TextColor="White">
+                        <Span.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="PortfolioLink" />
+                        </Span.GestureRecognizers>
+                    </Span>
+                    <Span Text="." />
+                </FormattedString>
+            </Label.FormattedText>
+            </Label>
+
+            <Label VerticalOptions="Center" HorizontalOptions="Center" Style="{StaticResource Text}">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="To view the Github repository for this app, click "/>
+                    <Span Text="here" TextDecorations="Underline" TextColor="White">
+                        <Span.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="GithubLink" />
+                        </Span.GestureRecognizers>
+                    </Span>
+                    <Span Text="." />
+                </FormattedString>
+            </Label.FormattedText>
+            </Label>
+
+            <Image
+                    Source="main_transparent.png"
+                    HeightRequest="185"
+                    Aspect="AspectFit"
+                    SemanticProperties.Description="set of aces from a deck of cards" />
 
         </VerticalStackLayout>
         <VerticalStackLayout>

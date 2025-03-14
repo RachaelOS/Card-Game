@@ -27,6 +27,8 @@
     <Color x:Key="Gray600">#404040</Color>
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
+    <Color x:Key="Gold">#997431</Color>
+    <Color x:Key="CasinoGreen">#14452F</Color>
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
@@ -42,4 +44,6 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+    <SolidColorBrush x:Key="GoldTitle" Color="{StaticResource Gold}"/>
+    <SolidColorBrush x:Key="CasinoGreenBrush" Color="{StaticResource CasinoGreen}"/>
 </ResourceDictionary>

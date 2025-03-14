@@ -1,15 +1,15 @@
-using System.Security.Cryptography.X509Certificates;
+﻿//using System.Security.Cryptography.X509Certificates;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics;
-using Microsoft.Maui.Devices;
+
+/*using Microsoft.Maui.Devices;
 using System.Collections.Concurrent;
 using Microsoft.Maui.Dispatching;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-
+using System.Xml.Linq;*/
 
 namespace Card_Game
 {
@@ -44,20 +44,58 @@ namespace Card_Game
         }
 
 
-        private async void image_update(string game_status)
+        private async void restart_button(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("Blackjack");
+            WeakReferenceMessenger.Default.Send(new StartGameMessage());
+        }
+
+        private void ShowScore(object sender, CheckedChangedEventArgs e)
+        {
+            //score_label.IsVisible = e.Value;
+
+            if (score_label.IsVisible == true)
+            {
+                score_label.IsVisible = false;
+            }
+            else
+            {
+                score_label.IsVisible = true;
+            }
+        }
+
+
+        private async void image_update(string game_status, string out_direction)
         {
             await Dispatcher.DispatchAsync(async () =>
             {
                 // Set the initial position of the new background image (off-screen)
 
                 // Animate the old background sliding out
-                await game_image.TranslateTo(-this.Width, 0, 1000, Easing.SinInOut);
+
+                switch (out_direction)
+                {
+                    case "left":
+                        await game_image.TranslateTo(-this.Width, 0, 1000, Easing.SinInOut);
+                        break;
+                    case "right":
+                        await game_image.TranslateTo(this.Width, 0, 1000, Easing.SinInOut);
+                        break;
+                }
 
                 switch (game_status)
                 {
                     case "dealer":
                         game_image.Source = "dealer.PNG";
-                        game_image.TranslationX = this.Width;
+                        switch (out_direction)
+                        {
+                            case "left":
+                                game_image.TranslationX = this.Width;
+                                break;
+                            case "right":
+                                game_image.TranslationX = -this.Width;
+                                break;
+                        }
                         await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
                         await Task.Delay(2000);
                         break;
@@ -74,14 +112,15 @@ namespace Card_Game
                         await Task.Delay(2000);
                         break;
                     case "all":
-                        game_image.Source = "main_transparent.png";
-                        game_image.TranslationX = this.Width;
-                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                        await Task.Delay(2000);
-                        break;
-                    case "end":
-                        game_image.Source = "game_over.jpg";
-                        game_image.TranslationX = this.Width;
+                        game_image.Source = "main_transparent.png"; switch (out_direction)
+                        {
+                            case "left":
+                                game_image.TranslationX = this.Width;
+                                break;
+                            case "right":
+                                game_image.TranslationX = -this.Width;
+                                break;
+                        }
                         await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
                         await Task.Delay(2000);
                         break;
@@ -311,6 +350,25 @@ namespace Card_Game
                 List<string> handDetails = new List<string>();
                 foreach (Card card in Cards)
                 {
+                    string suit = card.Suit;
+                    string emoji = "";
+
+                    switch (suit)
+                    {
+                        case "Hearts":
+                            emoji = "❤️";
+                            break;
+                        case "Clubs":
+                            emoji = "♣️";
+                            break;
+                        case "Spades":
+                            emoji = "♠️";
+                            break;
+                        case "Diamonds":
+                            emoji = "♦️";
+                            break;
+
+                    }
                     handDetails.Add($"{card.Rank} of {card.Suit}");
                 }
                 return string.Join(",", handDetails);
@@ -363,10 +421,11 @@ namespace Card_Game
             update_label.Text = newText;
         }
 
-        private void HandLabel(string newText)
+        private void ScoreLabel(int Score)
         {
-            hand_label.Text = newText;
-        }
+            string newText = Score.ToString();
+            score_label.Text = "Your Score: " + newText;
+        } 
 
         public Hand npc1 = new Hand("Player1");
         public Hand npc2 = new Hand("Player2");
@@ -385,8 +444,9 @@ namespace Card_Game
 
             await Task.Run(async () =>
             {
+
                 Dispatcher.Dispatch(() => UpdateLabel("Dealer is dealing the cards..."));
-                Dispatcher.Dispatch(() => image_update("dealer"));
+                Dispatcher.Dispatch(() => image_update("dealer", "left"));
 
                 await Task.Delay(2000);
 
@@ -415,10 +475,10 @@ namespace Card_Game
                 if (currentWindow?.Page is not null)
                 {
                     var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                    Dispatcher.Dispatch(() => blackjackPage.HandLabel(player.GetHand()));
+                    Dispatcher.Dispatch(() => blackjackPage.ScoreLabel(player.GetScore()));
                 }
 
-                await Dispatcher.DispatchAsync(() => image_update("all"));
+                await Dispatcher.DispatchAsync(() => image_update("all", "left"));
 
                 Debug.WriteLine("player hand: " + player.GetHand());
                 Debug.WriteLine("player score: " + player.GetScore());
@@ -457,13 +517,11 @@ namespace Card_Game
             {
                 await Task.Run(async () =>
                 {
-                    await Dispatcher.DispatchAsync(() => image_update("dealer"));
-
                     Card new_card = card.Deal();
                     player.AddCard(new_card);
                     await Dispatcher.DispatchAsync(async () =>
                     {
-                        HandLabel(player.GetHand());
+                        ScoreLabel(player.GetScore());
                         await AddNewImage(new_card, player);
                     });
                     int score = player.GetScore();
@@ -474,13 +532,14 @@ namespace Card_Game
 
                     if (score > 21)
                     {
-                        await Dispatcher.DispatchAsync(() => image_update("all"));
+                        await Dispatcher.DispatchAsync(() => image_update("all", "left"));
                         await Dispatcher.DispatchAsync(() => UpdateLabel("Bust! Player2's turn..."));
+                        await Task.Delay(2000);
                         Dispatcher.Dispatch(() => NPC2Turn());
                     }
                     else if (score == 21)
                     {
-                        await Dispatcher.DispatchAsync(() => image_update("all"));
+                        await Dispatcher.DispatchAsync(() => image_update("all", "left"));
                         Dispatcher.Dispatch(() => UpdateLabel("Blackjack! Press stick!"));
                     }
                 });
@@ -494,7 +553,7 @@ namespace Card_Game
                 Debug.WriteLine("player1's turn");
                 int npc1_score = npc1.GetScore();
 
-                await Dispatcher.DispatchAsync(() => image_update("npc1"));
+                await Dispatcher.DispatchAsync(() => image_update("npc1", "left"));
                 await Dispatcher.DispatchAsync(() => UpdateLabel("Player1's turn..."));
                 await Task.Delay(2000);
 
@@ -526,7 +585,7 @@ namespace Card_Game
                     await Task.Delay(2000);
                 }
 
-                await Dispatcher.DispatchAsync(() => image_update("all"));
+                await Dispatcher.DispatchAsync(() => image_update("all", "right"));
                 await Dispatcher.DispatchAsync(() => UpdateLabel("Your turn"));
                 player_turn = true;
             });
@@ -538,7 +597,7 @@ namespace Card_Game
             {
                 Debug.WriteLine("player2 turn");
                 await Dispatcher.DispatchAsync(() => UpdateLabel("Player2's turn..."));
-                await Dispatcher.DispatchAsync(() => image_update("npc2"));
+                await Dispatcher.DispatchAsync(() => image_update("npc2", "right"));
                 await Task.Delay(2000);
 
                 int npc2_score = npc2.GetScore();
@@ -579,7 +638,7 @@ namespace Card_Game
         {
             await Task.Run(async() =>
             {
-                await Dispatcher.DispatchAsync(() => image_update("dealer"));
+                await Dispatcher.DispatchAsync(() => image_update("dealer", "left"));
                 int dealer_score = dealer.GetScore();
                 int player_score = player.GetScore();
                 int npc1_score = npc1.GetScore();
@@ -606,6 +665,8 @@ namespace Card_Game
                     await Dispatcher.DispatchAsync(() => blackjackPage.UpdateLabel("Dealer's turn... \nDealer's hand: \n" + dealer.GetHand()));
                 }
 
+                await Task.Delay(2000);
+
                 while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21)
                 {
                     Card new_card = card.Deal();
@@ -616,10 +677,10 @@ namespace Card_Game
                     Debug.WriteLine("dealer score: " + dealer_score);
 
                     await Dispatcher.DispatchAsync(() => UpdateLabel("Dealer twists \nDealer's hand: \n" + dealer.GetHand()));
-                    await Task.Delay(1000);
+                    await Task.Delay(2000);
                 }
 
-                await Dispatcher.DispatchAsync(() => image_update("end"));
+                await Dispatcher.DispatchAsync(() => image_update("all", "right"));
 
                 if (dealer_score > 21)
                 {
@@ -630,12 +691,12 @@ namespace Card_Game
                 }
                 else if (dealer_score == 21)
                 {
-                    await Dispatcher.DispatchAsync(() => UpdateLabel("Blackjack! Dealer wins!"));
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("GAME OVER\nBlackjack! Dealer wins!"));
                     Debug.WriteLine("Dealer Blackjack");
                 }
                 else
                 {
-                    await Dispatcher.DispatchAsync(() => UpdateLabel("Dealer wins with score of " + dealer_score));
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("GAME OVER\nDealer wins with score of " + dealer_score));
                     Debug.WriteLine("Dealer wins with score of " + dealer_score);
                 }
             });
@@ -692,8 +753,8 @@ namespace Card_Game
 
                     await Dispatcher.DispatchAsync(() =>
                     {
-                        UpdateLabel($"Dealer Busts. {winner.Name} wins!");
-                        Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
+                        UpdateLabel($"GAME OVER\nDealer Busts. {winner.Name} wins!");
+                        Debug.WriteLine($"GAME OVER\nDealer Busts. {winner.Name} wins!");
                     });
                 }
                 //if there is only one winner
@@ -708,13 +769,13 @@ namespace Card_Game
                         {
                             if (winner == player)
                             {
-                                UpdateLabel($"Blackjack! {winner.Name} win!");
-                                Debug.WriteLine($"Blackjack! {winner.Name} win!");
+                                UpdateLabel($"GAME OVER\nBlackjack! {winner.Name} win!");
+                                Debug.WriteLine($"GAME OVER\nBlackjack! {winner.Name} win!");
                             }
                             else
                             {
-                                UpdateLabel($"Blackjack! {winner.Name} wins!");
-                                Debug.WriteLine($"Blackjack! {winner.Name} wins!");
+                                UpdateLabel($"GAME OVER\nBlackjack! {winner.Name} wins!");
+                                Debug.WriteLine($"GAME OVER\nBlackjack! {winner.Name} wins!");
                             }
                         });
                     }
@@ -722,8 +783,16 @@ namespace Card_Game
                     {
                         await Dispatcher.DispatchAsync(() =>
                         {
-                            UpdateLabel($"{winner.Name} wins with score of {highest_score}");
-                            Debug.WriteLine($"{winner.Name} wins with score of {highest_score}");
+                            if (winner == player)
+                            {
+                                UpdateLabel($"GAME OVER\n{winner.Name} win with score of {highest_score}");
+                                Debug.WriteLine($"GAME OVER\n{winner.Name} win with score of {highest_score}");
+                            }
+                            else
+                            {
+                                UpdateLabel($"GAME OVER\n{winner.Name} wins with score of {highest_score}");
+                                Debug.WriteLine($"GAME OVER\n{winner.Name} wins with score of {highest_score}");
+                            }
                         });
                     }
                 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;
+﻿//using Microsoft.Maui.Controls;
+//using Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;
 using Application = Microsoft.Maui.Controls.Application;
 
 namespace Card_Game

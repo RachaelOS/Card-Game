@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Card_Game.Instructions_page">
+             x:Class="Card_Game.Instructions_page"
+             BackgroundImageSource="background.jpg">
 
     <StackLayout
-            Padding="30,0"
-            Spacing="50">
+            Padding="30"
+            Spacing="50"
+            VerticalOptions="Start"
+            HorizontalOptions="Center">
         
         <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
+            Padding="30"
+            Spacing="40"
+            VerticalOptions="Start"
+            HorizontalOptions="Center">
         
             <Label 
                 Text="How To Play"
@@ -21,13 +26,15 @@
             <Label
                 Text="Welcome to Blackjack!"
                 VerticalOptions="Center" 
-                HorizontalOptions="Center"/>
+                HorizontalOptions="Center"
+                Style="{StaticResource SubHeadline}"/>
             
             <Label
                 Text="To play blackjack you must aim for the combined total of the cards in your hand to equal 21..."
                 VerticalOptions="Center" 
                 HorizontalOptions="Center"
-                x:Name="instructions_label"/>
+                x:Name="instructions_label"
+                Style="{StaticResource Text}"/>
 
             <Button 
                 Text="Next"
