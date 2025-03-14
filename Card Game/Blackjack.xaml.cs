@@ -2,7 +2,8 @@ using System.Security.Cryptography.X509Certificates;
 using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics;
 using Microsoft.Maui.Devices;
-
+using System.Collections.Concurrent;
+using Microsoft.Maui.Dispatching;
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls;
@@ -45,54 +46,47 @@ namespace Card_Game
 
         private async void image_update(string game_status)
         {
-            // Set the initial position of the new background image (off-screen)
-
-            // Animate the old background sliding out
-            await game_image.TranslateTo(-this.Width, 0, 1000, Easing.SinInOut);
-
-
-
-            switch (game_status)
+            await Dispatcher.DispatchAsync(async () =>
             {
-                case "dealer":
-                    //BackgroundImageSource = "dealing.jpg";
-                    game_image.Source = "dealer.PNG";
-                    // Set the initial position of the new background image (off-screen)
-                    game_image.TranslationX = this.Width;
-                    // Animate the new background image sliding in
-                    await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                    break;
-                case "npc1":
-                    game_image.Source = "npc1.png";
-                    // Set the initial position of the new background image (off-screen)
-                    game_image.TranslationX = this.Width;
-                    // Animate the new background image sliding in
-                    await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                    break;
-                case "npc2":
-                    game_image.Source = "npc2.png";
-                    // Set the initial position of the new background image (off-screen)
-                    game_image.TranslationX = -this.Width;
-                    // Animate the new background image sliding in
-                    await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                    break;
-                case "all":
-                    game_image.Source = "main_transparent.png";
-                    // Set the initial position of the new background image (off-screen)
-                    game_image.TranslationX = this.Width;
-                    // Animate the new background image sliding in
-                    await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                    break;
-                case "end":
-                    game_image.Source = "game_over.jpg";
-                    // Set the initial position of the new background image (off-screen)
-                    game_image.TranslationX = this.Width;
-                    // Animate the new background image sliding in
-                    await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
-                    break;
-            }
+                // Set the initial position of the new background image (off-screen)
 
+                // Animate the old background sliding out
+                await game_image.TranslateTo(-this.Width, 0, 1000, Easing.SinInOut);
 
+                switch (game_status)
+                {
+                    case "dealer":
+                        game_image.Source = "dealer.PNG";
+                        game_image.TranslationX = this.Width;
+                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
+                        await Task.Delay(2000);
+                        break;
+                    case "npc1":
+                        game_image.Source = "npc1.png";
+                        game_image.TranslationX = this.Width;
+                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
+                        await Task.Delay(2000);
+                        break;
+                    case "npc2":
+                        game_image.Source = "npc2.png";
+                        game_image.TranslationX = -this.Width;
+                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
+                        await Task.Delay(2000);
+                        break;
+                    case "all":
+                        game_image.Source = "main_transparent.png";
+                        game_image.TranslationX = this.Width;
+                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
+                        await Task.Delay(2000);
+                        break;
+                    case "end":
+                        game_image.Source = "game_over.jpg";
+                        game_image.TranslationX = this.Width;
+                        await game_image.TranslateTo(0, 0, 1000, Easing.SinInOut);
+                        await Task.Delay(2000);
+                        break;
+                }
+            });
         }
 
         private void Twist_click(object sender, EventArgs e)
@@ -332,35 +326,36 @@ namespace Card_Game
                 return Cards.Count;
             }
         }
-        private void AddNewImage(Card card, Hand player)
+        private async Task AddNewImage(Card card, Hand player)
         {
-            string img_name = card.Img_Name;
-            Debug.WriteLine(img_name);
-            int gridcolumn = player.CountCards() - 1;    
-            
-            // Add a new column to the grid if needed
-            if (handGrid.ColumnDefinitions.Count <= gridcolumn)
-            {
-                var columnDefinition = new ColumnDefinition
+                string img_name = card.Img_Name;
+                Debug.WriteLine(img_name);
+                int gridcolumn = player.CountCards() - 1;
+
+                // Add a new column to the grid if needed
+                if (handGrid.ColumnDefinitions.Count <= gridcolumn)
                 {
-                    Width = new GridLength(1, GridUnitType.Star)
+                    var columnDefinition = new ColumnDefinition
+                    {
+                        Width = new GridLength(1, GridUnitType.Star)
+                    };
+
+                    // Add the ColumnDefinition to the Grid
+                    handGrid.ColumnDefinitions.Add(columnDefinition);
+                }
+                // Create a new Image object
+                var newImage = new Image
+                {
+                    Source = $"/Resources/Images/deck/{img_name}", // Set the correct path to your image
+                    Aspect = Aspect.AspectFit,
+                    HeightRequest = 100,
+                    WidthRequest = 70
                 };
 
-                // Add the ColumnDefinition to the Grid
-                handGrid.ColumnDefinitions.Add(columnDefinition);
-            }
-            // Create a new Image object
-            var newImage = new Image
-            {
-                Source = $"/Resources/Images/deck/{img_name}", // Set the correct path to your image
-                Aspect = Aspect.AspectFit,
-                HeightRequest = 100,
-                WidthRequest = 70
-            };
-
-            // Add the new Image to the Grid
-            Grid.SetColumn(newImage, gridcolumn); // Set the column position
-            this.Content.FindByName<Grid>("handGrid").Children.Add(newImage); // Add the new image to the grid
+                // Add the new Image to the Grid
+                Grid.SetColumn(newImage, gridcolumn); // Set the column position
+                this.Content.FindByName<Grid>("handGrid").Children.Add(newImage); // Add the new image to the grid
+                await Task.Delay(100);
         }
 
         private void UpdateLabel(string newText)
@@ -388,64 +383,59 @@ namespace Card_Game
         public async void StartGame()
         {
 
-            Hand[] players = { npc1, player, npc2, dealer };
-
-            // shuffle deck
-            card.Shuffle();
-
-            image_update("dealer");
-
-            UpdateLabel("Dealer is dealing the cards...");
-            await Task.Delay(3000);
-
-            // deal cards - 2 each 
-            foreach (Hand hand in players)
+            await Task.Run(async () =>
             {
-                Card new_card1 = card.Deal();
-                hand.AddCard(new_card1);
-                if (hand == player)
+                Dispatcher.Dispatch(() => UpdateLabel("Dealer is dealing the cards..."));
+                Dispatcher.Dispatch(() => image_update("dealer"));
+
+                await Task.Delay(2000);
+
+                Hand[] players = { npc1, player, npc2, dealer };
+
+                card.Shuffle();
+
+
+                foreach (Hand hand in players)
                 {
-                    AddNewImage(new_card1, hand);
+                    Card new_card1 = card.Deal();
+                    hand.AddCard(new_card1);
+                    if (hand == player)
+                    {
+                        await Dispatcher.DispatchAsync(() => AddNewImage(new_card1, hand));
+                    }
+                    Card new_card2 = card.Deal();
+                    hand.AddCard(new_card2);
+                    if (hand == player)
+                    {
+                        await Dispatcher.DispatchAsync(() => AddNewImage(new_card2, hand));
+                    }
                 }
-                Card new_card2 = card.Deal();
-                hand.AddCard(new_card2);
-                if (hand == player)
+
+                var currentWindow = Application.Current?.Windows.FirstOrDefault();
+                if (currentWindow?.Page is not null)
                 {
-                    AddNewImage(new_card2, hand);
+                    var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
+                    Dispatcher.Dispatch(() => blackjackPage.HandLabel(player.GetHand()));
                 }
 
-            }
+                await Dispatcher.DispatchAsync(() => image_update("all"));
 
+                Debug.WriteLine("player hand: " + player.GetHand());
+                Debug.WriteLine("player score: " + player.GetScore());
 
+                Debug.WriteLine("dealer hand: " + dealer.GetHand());
+                Debug.WriteLine("dealer score: " + dealer.GetScore());
 
+                Debug.WriteLine("npc1 hand: " + npc1.GetHand());
+                Debug.WriteLine("npc1 score: " + npc1.GetScore());
 
-            // print player's cards
-            var currentWindow = Application.Current?.Windows.FirstOrDefault();
-            if (currentWindow?.Page is not null)
-            {
-                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.HandLabel(player.GetHand());
-            }
+                Debug.WriteLine("npc2 hand: " + npc2.GetHand());
+                Debug.WriteLine("npc2 score: " + npc2.GetScore());
 
+                await Task.Delay(3000);
 
-            image_update("all");
-
-            Debug.WriteLine("player hand: " + player.GetHand());
-            Debug.WriteLine("player score: " + player.GetScore());
-
-            Debug.WriteLine("dealer hand: " + dealer.GetHand());
-            Debug.WriteLine("dealer score: " + dealer.GetScore());
-
-            Debug.WriteLine("npc1 hand: " + npc1.GetHand());
-            Debug.WriteLine("npc1 score: " + npc1.GetScore());
-
-            Debug.WriteLine("npc2 hand: " + npc2.GetHand());
-            Debug.WriteLine("npc2 score: " + npc2.GetScore());
-
-
-            await Task.Delay(3000);
-
-            NPC1Turn();
+                Dispatcher.Dispatch(() => NPC1Turn());
+            });
         }
 
         private async void Stick()
@@ -453,294 +443,292 @@ namespace Card_Game
             if (player_turn == true)
             {
                 player_turn = false;
-                UpdateLabel("You chose to stick! Player2's turn...");
+                Dispatcher.Dispatch(() => UpdateLabel("You chose to stick! Player2's turn..."));
                 Debug.WriteLine("player stick");
                 await Task.Delay(2000);
 
                 NPC2Turn();
             }
         }
+
         private async void Twist()
         {
             if (player_turn == true)
             {
-                image_update("dealer");
-
-                await Task.Delay(1000);
-
-                Card new_card = card.Deal();
-                player.AddCard(new_card);
-                HandLabel(player.GetHand());
-                AddNewImage(new_card, player);
-                int score = player.GetScore();
-
-                Debug.WriteLine("player twist");
-                Debug.WriteLine("player hand: " + player.GetHand());
-                Debug.WriteLine("player score: " + score);
-
-                if (score > 21)
+                await Task.Run(async () =>
                 {
-                    image_update("all");
-                    UpdateLabel("Bust! Player2's turn...");
-                    await Task.Delay(3000);
+                    await Dispatcher.DispatchAsync(() => image_update("dealer"));
 
-                    NPC2Turn();
-                }
-                else if (score == 21)
-                {
-                    image_update("all");
-                    UpdateLabel("Blackjack! Press stick!");
-                    await Task.Delay(1000);
-                }
+                    Card new_card = card.Deal();
+                    player.AddCard(new_card);
+                    await Dispatcher.DispatchAsync(async () =>
+                    {
+                        HandLabel(player.GetHand());
+                        await AddNewImage(new_card, player);
+                    });
+                    int score = player.GetScore();
 
-                
+                    Debug.WriteLine("player twist");
+                    Debug.WriteLine("player hand: " + player.GetHand());
+                    Debug.WriteLine("player score: " + score);
+
+                    if (score > 21)
+                    {
+                        await Dispatcher.DispatchAsync(() => image_update("all"));
+                        await Dispatcher.DispatchAsync(() => UpdateLabel("Bust! Player2's turn..."));
+                        Dispatcher.Dispatch(() => NPC2Turn());
+                    }
+                    else if (score == 21)
+                    {
+                        await Dispatcher.DispatchAsync(() => image_update("all"));
+                        Dispatcher.Dispatch(() => UpdateLabel("Blackjack! Press stick!"));
+                    }
+                });
             }
-
         }
-
-
-
-
-        // player 1 takes turn - stick or bust- print actions
 
         private async void NPC1Turn()
         {
-            Debug.WriteLine("player1's turn");
-            int npc1_score = npc1.GetScore();
-
-            image_update("npc1");
-            UpdateLabel("Player1's turn...");
-            await Task.Delay(3000);
-
-
-            if (npc1_score < 13)
+            await Task.Run(async() =>
             {
-                image_update("dealer");
-                Card new_card = card.Deal();
-                npc1.AddCard(new_card);
-                npc1_score = npc1.GetScore();
+                Debug.WriteLine("player1's turn");
+                int npc1_score = npc1.GetScore();
 
-                Debug.WriteLine("npc1 new hand: " + npc1.GetHand());
-                Debug.WriteLine("npc1 new score: " + npc1_score);
+                await Dispatcher.DispatchAsync(() => image_update("npc1"));
+                await Dispatcher.DispatchAsync(() => UpdateLabel("Player1's turn..."));
+                await Task.Delay(2000);
 
-                UpdateLabel("Player1 twists");
-                await Task.Delay(3000);
-            }
+                if (npc1_score < 13)
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("dealer"));
+                    Card new_card = card.Deal();
+                    npc1.AddCard(new_card);
+                    npc1_score = npc1.GetScore();
 
+                    Debug.WriteLine("npc1 new hand: " + npc1.GetHand());
+                    Debug.WriteLine("npc1 new score: " + npc1_score);
 
-            if (npc1_score > 21)
-            {
-                image_update("npc1");
-                UpdateLabel("Player1 is bust!");
-                Debug.WriteLine("npc1 busts");
-                await Task.Delay(3000);
-            }
-            else
-            {
-                image_update("npc1");
-                UpdateLabel("Player1 chose to stick.");
-                await Task.Delay(3000);
-            }
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player1 twists"));
+                    await Task.Delay(2000);
+                }
 
-            image_update("all");
+                if (npc1_score > 21)
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("npc1"));
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player1 is bust!"));
+                    Debug.WriteLine("npc1 busts");
+                    await Task.Delay(2000);
+                }
+                else
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("npc1"));
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player1 chose to stick."));
+                    await Task.Delay(2000);
+                }
 
-            UpdateLabel("Your turn");
-
-            await Task.Delay(1000);
-            player_turn = true;
+                await Dispatcher.DispatchAsync(() => image_update("all"));
+                await Dispatcher.DispatchAsync(() => UpdateLabel("Your turn"));
+                player_turn = true;
+            });
         }
-
-
-        // player 2 takes turn - stick or bust - print actions
 
         private async void NPC2Turn()
         {
-            Debug.WriteLine("player2 turn");
-            image_update("npc2");
-            UpdateLabel("Player2's turn...");
-            await Task.Delay(3000);
-
-            int npc2_score = npc2.GetScore();
-
-            if (npc2_score < 17)
+            await Task.Run(async () =>
             {
-                image_update("dealer");
-                Card new_card = card.Deal();
-                npc2.AddCard(new_card);
-                npc2_score = npc2.GetScore();
+                Debug.WriteLine("player2 turn");
+                await Dispatcher.DispatchAsync(() => UpdateLabel("Player2's turn..."));
+                await Dispatcher.DispatchAsync(() => image_update("npc2"));
+                await Task.Delay(2000);
 
-                UpdateLabel("Player2 twists");
-                await Task.Delay(3000);
+                int npc2_score = npc2.GetScore();
 
-                Debug.WriteLine("npc2 new hand: " + npc2.GetHand());
-                Debug.WriteLine("npc2 new hand: " + npc2_score);
-            }
+                if (npc2_score < 17)
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("dealer"));
+                    Card new_card = card.Deal();
+                    npc2.AddCard(new_card);
+                    npc2_score = npc2.GetScore();
 
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player2 twists"));
 
-            if (npc2_score > 21)
-            {
-                image_update("npc2");
-                Debug.WriteLine("npc2 busts");
-                UpdateLabel("Player2 is bust! Dealer's turn...");
-                await Task.Delay(300);
-            }
-            else
-            {
-                image_update("npc2");   
-                UpdateLabel("Player2 chose to stick. Dealer's turn...");
-                await Task.Delay(3000);
-            }
+                    Debug.WriteLine("npc2 new hand: " + npc2.GetHand());
+                    Debug.WriteLine("npc2 new hand: " + npc2_score);
+                    await Task.Delay(2000);
+                }
 
-            DealersTurn();
+                if (npc2_score > 21)
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("npc2"));
+                    Debug.WriteLine("npc2 busts");
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player2 is bust! Dealer's turn..."));
+                    await Task.Delay(2000);
+                }
+                else
+                {
+                    //await Dispatcher.DispatchAsync(() => image_update("npc2"));
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Player2 chose to stick. Dealer's turn..."));
+                    await Task.Delay(1000);
+                }
+
+                Dispatcher.Dispatch(() => DealersTurn());
+            });
         }
-
-
 
         private async void DealersTurn()
         {
-            image_update("dealer");
-            int dealer_score = dealer.GetScore();
-            int player_score = player.GetScore();
-            int npc1_score = npc1.GetScore();
-            int npc2_score = npc2.GetScore();
-            string player_status = player.Status();
-            string npc1_status = npc1.Status();
-            string npc2_status = npc2.Status();
-            //keep statuses and names in same order
-            string[] statuses = { player_status, npc1_status, npc2_status };
-            int[] scores = { player_score, npc1_score, npc2_score };
-
-            // sets variable for scores = 0 if that player is bust
-            foreach (string status in statuses)
+            await Task.Run(async() =>
             {
-                if (status == "Bust")
+                await Dispatcher.DispatchAsync(() => image_update("dealer"));
+                int dealer_score = dealer.GetScore();
+                int player_score = player.GetScore();
+                int npc1_score = npc1.GetScore();
+                int npc2_score = npc2.GetScore();
+                string player_status = player.Status();
+                string npc1_status = npc1.Status();
+                string npc2_status = npc2.Status();
+                string[] statuses = { player_status, npc1_status, npc2_status };
+                int[] scores = { player_score, npc1_score, npc2_score };
+
+                foreach (string status in statuses)
                 {
-                    int index = Array.IndexOf(statuses, status);
-                    scores[index] = 0;
+                    if (status == "Bust")
+                    {
+                        int index = Array.IndexOf(statuses, status);
+                        scores[index] = 0;
+                    }
                 }
 
-            }
+                var currentWindow = Application.Current?.Windows.FirstOrDefault();
+                if (currentWindow?.Page is not null)
+                {
+                    var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
+                    await Dispatcher.DispatchAsync(() => blackjackPage.UpdateLabel("Dealer's turn... \nDealer's hand: \n" + dealer.GetHand()));
+                }
 
+                while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21)
+                {
+                    Card new_card = card.Deal();
+                    dealer.AddCard(new_card);
+                    dealer_score = dealer.GetScore();
 
-            // print dealer's cards
-            var currentWindow = Application.Current?.Windows.FirstOrDefault();
-            if (currentWindow?.Page is not null)
-            {
-                var blackjackPage = (Blackjack)currentWindow.Page.Navigation.NavigationStack.Last();
-                blackjackPage.UpdateLabel("Dealer's turn... \nDealer's hand: \n" + dealer.GetHand());
-            }
-            await Task.Delay(1500);
+                    Debug.WriteLine("dealer new hand: " + dealer.GetHand());
+                    Debug.WriteLine("dealer score: " + dealer_score);
 
-            while ((dealer_score < player_score || dealer_score < npc1_score || dealer_score < npc2_score) && dealer_score < 21)
-            {
-                
-                Card new_card = card.Deal();
-                dealer.AddCard(new_card);
-                dealer_score = dealer.GetScore();
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Dealer twists \nDealer's hand: \n" + dealer.GetHand()));
+                    await Task.Delay(1000);
+                }
 
-                Debug.WriteLine("dealer new hand: " + dealer.GetHand());
-                Debug.WriteLine("dealer score: " + dealer_score);
+                await Dispatcher.DispatchAsync(() => image_update("end"));
 
-                UpdateLabel("Dealer twists \nDealer's hand: \n" + dealer.GetHand());
-                await Task.Delay(1500);
-            }
+                if (dealer_score > 21)
+                {
+                    Debug.WriteLine("dealer bust");
+                    dealer_score = 0;
 
-            image_update("end");
-
-            if (dealer_score > 21)
-            {
-                Debug.WriteLine("dealer bust");
-                dealer_score = 0;
-
-                Winner();
-
-            }
-            else if (dealer_score == 21)
-            {
-                
-                UpdateLabel("Blackjack! Dealer wins!");
-                Debug.WriteLine("Dealer Blackjack");
-            }
-            else
-            {
-                UpdateLabel("Dealer wins with score of " + dealer_score);
-                Debug.WriteLine("Dealer wins with score of " + dealer_score);
-            }
+                    Dispatcher.Dispatch(() => Winner());
+                }
+                else if (dealer_score == 21)
+                {
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Blackjack! Dealer wins!"));
+                    Debug.WriteLine("Dealer Blackjack");
+                }
+                else
+                {
+                    await Dispatcher.DispatchAsync(() => UpdateLabel("Dealer wins with score of " + dealer_score));
+                    Debug.WriteLine("Dealer wins with score of " + dealer_score);
+                }
+            });
         }
-        // end of game
-
-
 
         //determines winner of game
         public async void Winner()
         {
-            player.Name = "You";
-            Hand[] players = { npc1, player, npc2 };
-            List<Hand> candidates = new List<Hand>();
-            List<int> scores = new List<int>();
-            List<Hand> highest_scores = new List<Hand>();
-
-            //only consider players who are not bust
-            foreach (Hand name in players)
+            await Task.Run(async() =>
             {
-                if (name.Status() != "Bust")
+                player.Name = "You";
+                Hand[] players = { npc1, player, npc2 };
+                List<Hand> candidates = new List<Hand>();
+                List<int> scores = new List<int>();
+                List<Hand> highest_scores = new List<Hand>();
+
+                //only consider players who are not bust
+                foreach (Hand name in players)
                 {
-                    candidates.Add(name);
-                }
-            }
-
-            //add candidate scores to list
-            foreach (Hand candidate in candidates)
-            {
-                scores.Add(candidate.GetScore());
-            }
-
-            int highest_score = scores.Max();
-
-
-            //if there are multiple winners, randomly select winner
-            if (scores.Count(x => x == highest_score) > 1)
-            {
-                foreach (Hand candidate in candidates)
-                {
-                    if (candidate.GetScore() == highest_score)
+                    if (name.Status() != "Bust")
                     {
-                        highest_scores.Add(candidate);
+                        candidates.Add(name);
                     }
                 }
-                Random rng = new Random();
-                int index = rng.Next(0, highest_scores.Count);
-                Hand winner = highest_scores[index];
 
-                UpdateLabel($"There's a draw! Randomly selecting winner!");
-                Debug.WriteLine($"There's a draw! Randomly selecting winner!");
-                await Task.Delay(2000);
-
-                UpdateLabel($"Dealer Busts. {winner.Name} wins!");
-                Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
-            }
-            //if there is only one winner
-            else
-            {
-                int index = scores.IndexOf(highest_score);
-                Hand winner = candidates[index];
-
-                if (winner.GetScore() == 21)
+                //add candidate scores to list
+                foreach (Hand candidate in candidates)
                 {
-                    UpdateLabel($"Blackjack! {winner.Name} wins!");
-                    Debug.WriteLine($"Blackjack! {winner.Name} wins!");
+                    scores.Add(candidate.GetScore());
                 }
+
+                int highest_score = scores.Max();
+
+
+                //if there are multiple winners, randomly select winner
+                if (scores.Count(x => x == highest_score) > 1)
+                {
+                    foreach (Hand candidate in candidates)
+                    {
+                        if (candidate.GetScore() == highest_score)
+                        {
+                            highest_scores.Add(candidate);
+                        }
+                    }
+                    Random rng = new Random();
+                    int index = rng.Next(0, highest_scores.Count);
+                    Hand winner = highest_scores[index];
+
+                    await Dispatcher.DispatchAsync(() =>
+                    {
+                        UpdateLabel($"There's a draw! Randomly selecting winner!");
+                        Debug.WriteLine($"There's a draw! Randomly selecting winner!");
+                    });
+
+                    await Dispatcher.DispatchAsync(() =>
+                    {
+                        UpdateLabel($"Dealer Busts. {winner.Name} wins!");
+                        Debug.WriteLine($"Dealer Busts. {winner.Name} wins!");
+                    });
+                }
+                //if there is only one winner
                 else
                 {
-                    UpdateLabel($"{winner.Name} wins with score of {highest_score}");
-                    Debug.WriteLine($"{winner.Name} wins with score of {highest_score}");
+                    int index = scores.IndexOf(highest_score);
+                    Hand winner = candidates[index];
+
+                    if (winner.GetScore() == 21)
+                    {
+                        await Dispatcher.DispatchAsync(() =>
+                        {
+                            if (winner == player)
+                            {
+                                UpdateLabel($"Blackjack! {winner.Name} win!");
+                                Debug.WriteLine($"Blackjack! {winner.Name} win!");
+                            }
+                            else
+                            {
+                                UpdateLabel($"Blackjack! {winner.Name} wins!");
+                                Debug.WriteLine($"Blackjack! {winner.Name} wins!");
+                            }
+                        });
+                    }
+                    else
+                    {
+                        await Dispatcher.DispatchAsync(() =>
+                        {
+                            UpdateLabel($"{winner.Name} wins with score of {highest_score}");
+                            Debug.WriteLine($"{winner.Name} wins with score of {highest_score}");
+                        });
+                    }
                 }
 
-            }
-
-
-
-
+            });
         }
     }
 }
