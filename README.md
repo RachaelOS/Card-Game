@@ -1,0 +1,1 @@
+This is a BlackJack mobile app made using .NET MAUI - it should be compatable with Android and iOS. It can also work on Windows but not very well. More details and descriptions will be added to this page.
