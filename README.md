@@ -1,3 +1,6 @@
+# Blackjack!
+#### Video Demo:
+#### Description:
 This is a BlackJack mobile app made using .NET MAUI - it is compatible with Android and iOS. The character artwork was made by me. Note: the files in the platforms folder were created automatically with only minor edits by myself. This was submitted as my final project for the Harvard CS50 Introduction to Computer Science course.
 
 There are 4 pages in this app: menu screen, game screen, about page and the instructions page. This app was created in Visual Studio 2022 using the .NET MAUI framework. Each page's layout and appearance is defined using xaml files. Each page also has a "behind code" file which is written in C# which defines all the functions in each page. Blackjack is a card game where you aim to have a hand of cards whose value sums to 21. The winner is the player who has a hand of cards with a value closest to 21, but not greater than 21. A hand greater than 21 results in the player being "bust" (out). If the dealer equals the player with the best hand or if all players are bust, the dealer wins. Each turn, a player can "stick" (no more cards) or "twist" (new card dealt). In this app, there is a virtual dealer and 2 virtual players - Player 1 and Player 2.
