@@ -1,5 +1,5 @@
 # Blackjack!
-#### Video Demo:
+#### Video Demo: https://www.youtube.com/watch?v=zJX16Ka0JEE
 #### Description:
 This is a BlackJack mobile app made using .NET MAUI - it is compatible with Android and iOS. The character artwork was made by me. Note: the files in the platforms folder were created automatically with only minor edits by myself. This was submitted as my final project for the Harvard CS50 Introduction to Computer Science course.
 
